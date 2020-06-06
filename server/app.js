@@ -44,7 +44,7 @@ app.use(userRoute);
 //Serving static files
 app.use("/", express.static(path.join(__dirname, "public")));
 
-const port = process.env.PORT;
+const port = process.env.PORT || 9090;
 app.listen(port, (error) => {
   if (error) {
     console.log("server can not listening");

@@ -10,7 +10,7 @@ const Nav = (props) => {
     onAuth(false);
     try {
       await axios.get(
-        "http://ec2-54-172-55-44.compute-1.amazonaws.com/users/logout"
+        "http://ec2-34-234-204-188.compute-1.amazonaws.com/users/logout"
       );
       return;
     } catch (err) {

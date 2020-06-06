@@ -10,7 +10,9 @@ const PrivateRoute = ({ component: Component, auth, ...rest }) => {
   useEffect(() => {
     const userStatus = async () => {
       try {
-        const response = await axios.get("http://localhost:9090/users/session");
+        const response = await axios.get(
+          "http://ec2-34-234-204-188.compute-1.amazonaws.com/users/session"
+        );
         const data = response.data;
         console.log(data.data);
         localStorage.setItem("user", JSON.stringify(data.data));

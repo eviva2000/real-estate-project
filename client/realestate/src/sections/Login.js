@@ -24,7 +24,7 @@ const Login = (props) => {
       },
     };
     const res = await fetch(
-      "http://ec2-54-172-55-44.compute-1.amazonaws.com/users/login",
+      "http://ec2-34-234-204-188.compute-1.amazonaws.com/users/login",
       options
     );
     const data = await res.json();
