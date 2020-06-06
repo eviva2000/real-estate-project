@@ -1,54 +1,50 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import Login from "../sections/Login";
-import Signup from "../sections/Signup";
-import Profile from "../sections/Profile";
-import Inventory from "../sections/Inventory";
-import { ProtectedRoute } from "./ProtectedRout";
-
-const Nav = () => {
-  const [userId, setUserId] = useState("");
+import React from "react";
+import Logo from "../assets/logo2.png";
+import { Link } from "react-router-dom";
+import axios from "axios";
+const Nav = (props) => {
+  const { userData, isAuth, onAuth } = props;
+  console.log("user data ...", userData);
+  const handleLogout = async () => {
+    localStorage.removeItem("user");
+    onAuth(false);
+    try {
+      await axios.get(
+        "http://ec2-54-172-55-44.compute-1.amazonaws.com/users/logout"
+      );
+      return;
+    } catch (err) {
+      return;
+    }
+  };
   return (
     <div className="Nav">
-      <Router>
-        {userId ? (
-          <ul>
-            <Link to="/">Home</Link>
-            <Link to="/inventory">Inventory</Link>
-            <Link to="/profile">Profile</Link>
-            <Link to="/logout">Log out</Link>
-          </ul>
-        ) : (
-          <ul>
-            <Link to="/">Home</Link>
-            <Link to="/inventory">Inventory</Link>
-
-            <Link to="/login">Login</Link>
-            <Link to="/signup">Signup</Link>
-          </ul>
-        )}
-
-        <div>
-          <Switch>
-            <Route exact path="/" />
-            <Route path="/login">
-              <Login setUserId={setUserId} />
-            </Route>
-            <Route path="/signup">
-              <Signup setUserId={setUserId} />
-            </Route>{" "}
-            />
-            <ProtectedRoute path="/profile">
-              <Profile userId={userId} />
-            </ProtectedRoute>{" "}
-            />
-            <ProtectedRoute path="/inventory">
-              <Inventory userId={userId} />
-            </ProtectedRoute>{" "}
-            />
-          </Switch>
-        </div>
-      </Router>
+      <div id="imgContainer">
+        <img src={Logo} alt="logo" />
+        {isAuth ? <p>Hi {userData.firstname} </p> : null}
+      </div>
+      {isAuth ? (
+        <ul>
+          <Link to="/inventory">Inventory</Link>
+          <Link to="/profile">Profile</Link>
+          <button id="logout" onClick={handleLogout}>
+            Log out
+          </button>
+        </ul>
+      ) : (
+        <ul>
+          <Link to="/">Home</Link>
+          <Link to="/inventory">Inventory</Link>
+          <div id="signInUpContainer">
+            <div className="signInUp" id="signin">
+              <Link to="/login">Login</Link>
+            </div>
+            <div className="signInUp" id="signup">
+              <Link to="/signup">Signup</Link>
+            </div>
+          </div>
+        </ul>
+      )}
     </div>
   );
 };

@@ -1,16 +1,29 @@
 const express = require("express");
 const session = require("express-session");
 const app = express();
+const path = require("path");
 const cors = require("cors");
 const dotEnv = require("dotenv");
 dotEnv.config();
 app.use(express.json()); // to parse the body of an HTTP request
-app.use(cors());
+// app.use(cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:9090");
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+  );
+  next();
+});
 app.use(
   session({
+    name: "sid",
     secret: "secretkey",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
   })
 );
 /*  Setting up database */
@@ -27,6 +40,9 @@ Model.knex(knex);
 
 const userRoute = require("./routes/user");
 app.use(userRoute);
+
+//Serving static files
+app.use("/", express.static(path.join(__dirname, "public")));
 
 const port = process.env.PORT;
 app.listen(port, (error) => {

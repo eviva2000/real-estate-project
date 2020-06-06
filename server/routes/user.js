@@ -2,8 +2,22 @@ const router = require("express").Router();
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-router.get("/", (req, res) => {
-  res.send("heloo");
+const jwt = require("jsonwebtoken");
+
+/* HOME PAGE */
+
+router.get("/", async (req, res) => {
+  console.log("session form home...", req.session);
+  const { userId } = req.session;
+  console.log("id", userId);
+  if (req.session.id && userId) {
+    const users = await User.query().select().where({ id: userId });
+    const user = users[0];
+    console.log("  from home", user);
+    res.send(user);
+  } else {
+    res.send({ isAuthenticated: false });
+  }
 });
 
 /* SIGNUP */
@@ -58,15 +72,17 @@ router.post("/users/signup", async (req, res) => {
             .send({ status: 500, message: "internal server error" });
         }
         // Store user with hash in DB.
-        const user = await User.query().insert({
+        const newUser = await User.query().insert({
           firstname,
           lastname,
           email,
           password: hash,
         });
-        req.session.userId = user.id;
-        req.session.save();
-        res.send({ status: 200, userId: user.id });
+
+        res.send({
+          status: 200,
+          newUser,
+        });
       });
     } catch (err) {
       res.status(500).send({ status: 500, message: "DB error" });
@@ -101,16 +117,47 @@ router.post("/users/login", async (req, res) => {
       if (!isMatch) {
         res.status(400).send({ status: 400, message: "Wrong credentials" });
       } else {
-        req.session.userId = user.id;
-        req.session.save();
-        // console.log(req.session);
-        res.send({ status: 200, userId: user.id });
+        req.session.user = user;
+        console.log("login...", req.session.user);
+        return res.send({
+          response: user,
+        });
       }
     });
   } catch (err) {
     console.log(err);
     res.status(400).send({ status: 400, message: "Bad request" });
   }
+});
+
+/* USER PROFILE */
+router.get("/users/profile/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  const user = await User.query().findOne({ id: userId });
+  const response = {
+    firstname: user.firstname,
+    lastname: user.lastname,
+    email: user.email,
+  };
+  return res.send(response);
+});
+
+/* Check user session */
+router.get("/users/session", (req, res) => {
+  if (req.session.user) {
+    return res
+      .status(200)
+      .send({ message: "Successfully logged in!", data: req.session.user });
+  } else {
+    return res.status(401).send({ message: "You must log in!" });
+  }
+});
+
+/* LOG OUT */
+router.get("/users/logout", (req, res) => {
+  req.session.destroy();
+
+  res.status(200).send({ message: "Successfully logged out" });
 });
 
 module.exports = router;
