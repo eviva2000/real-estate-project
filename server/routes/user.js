@@ -3,10 +3,11 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 /* HOME PAGE */
 
-router.get("/", async (req, res) => {
+router.get("/users/status", async (req, res) => {
   console.log("session form home...", req.session);
   const { userId } = req.session;
   console.log("id", userId);

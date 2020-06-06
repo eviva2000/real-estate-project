@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import NavBar from "./components/Nav";
@@ -19,6 +19,19 @@ function App() {
   const [userData, setUserData] = useState(
     localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : ""
   );
+  useEffect(() => {
+    const getUserStatus = async () => {
+      try {
+        await axios.get(
+          "http://ec2-34-234-204-188.compute-1.amazonaws.com/users/status"
+        );
+        return;
+      } catch (err) {
+        return;
+      }
+    };
+    getUserStatus();
+  }, []);
 
   return (
     <Router>
