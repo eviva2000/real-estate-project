@@ -44,6 +44,10 @@ app.use(userRoute);
 //Serving static files
 app.use("/", express.static(path.join(__dirname, "public")));
 
+app.get("/", (req, res) => {
+  return res.sendFile(__dirname + "/public/index.html");
+});
+
 const port = process.env.PORT || 9090;
 app.listen(port, (error) => {
   if (error) {
